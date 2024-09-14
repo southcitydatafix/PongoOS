@@ -110,11 +110,8 @@ extern volatile char gBootFlag;
 #define BOOT_FLAG_DEFAULT 0
 #define BOOT_FLAG_HARD 1
 #define BOOT_FLAG_HOOK 2
-#define BOOT_FLAG_LINUX 3
+// 3: Reserved
 #define BOOT_FLAG_RAW 4
-
-#define LINUX_DTREE_SIZE 262144
-#define LINUX_CMDLINE_SIZE 4096
 
 typedef uint64_t lock;
 extern void lock_take(lock* lock); // takes a lock spinning initially but after being pre-empted once it will start yielding until it acquires it
@@ -409,9 +406,6 @@ extern void mask_interrupt(uint32_t reg);
 extern _Noreturn void wdt_reset();
 extern void wdt_enable();
 extern void wdt_disable();
-extern bool linux_can_boot();
-extern void linux_prep_boot();
-extern void linux_boot();
 extern void command_register(const char* name, const char* desc, void (*cb)(const char* cmd, char* args));
 extern char* command_tokenize(char* str, uint32_t strbufsz);
 extern uint8_t get_el(void);

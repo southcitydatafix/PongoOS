@@ -247,11 +247,6 @@ __attribute__((noinline)) void pongo_entry_cached()
         case BOOT_FLAG_RAW: // 4
             break;
 
-        case BOOT_FLAG_LINUX: // 3
-            linux_prep_boot();
-            boot_msg = "Booting Linux...";
-            break;
-
         case BOOT_FLAG_HOOK: // 2
             // Hook for kernel patching here
             screen_puts("Invoking preboot hook");
@@ -327,14 +322,7 @@ _Noreturn void pongo_entry(uint64_t *kernel_args, void *entryp, void (*exit_to_e
     }
     else
     {
-        if(gBootFlag == BOOT_FLAG_LINUX)
-        {
-            linux_boot();
-        }
-        else
-        {
-            xnu_boot();
-        }
+        xnu_boot();
         exit_to_el1_image(gBootArgs, gEntryPoint, (void*)((gTopOfKernelData + 0x3fffULL) & ~0x3fffULL));
     }
     screen_puts("didn't boot?!");
