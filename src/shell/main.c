@@ -46,6 +46,20 @@ void pongo_boot_raw() {
     task_yield();
 }
 
+extern char gFWVersion[256];
+void pongo_boot_m1n1() {
+    if (!loader_xfer_recv_count) {
+        iprintf("please upload a raw m1n1.bin before issuing this command\n");
+        return;
+    }
+    loader_xfer_recv_count = 0;
+    char *fwversion = dt_get_prop("/chosen", "firmware-version", NULL);
+    strlcpy(fwversion, gFWVersion, 256);
+
+    gBootFlag = BOOT_FLAG_M1N1;
+    task_yield();
+}
+
 void* ramdisk_buf;
 uint32_t ramdisk_size;
 
@@ -249,8 +263,9 @@ void shell_main() {
     extern void task_list(const char *, char*);
     command_register("panic", "calls panic()", panic_cmd);
     command_register("ps", "lists current tasks and irq handlers", task_list);
-    command_register("ramdisk", "loads a ramdisk for xnu or linux", ramdisk_cmd);
+    command_register("ramdisk", "loads a ramdisk for xnu", ramdisk_cmd);
     command_register("bootr", "boot raw image", pongo_boot_raw);
+    command_register("bootm", "boots m1n1", pongo_boot_m1n1);
     command_register("spin", "spins 1 second", pongo_spin);
     command_register("md8", "memory dump", md8_cmd);
     command_register("peek", "32bit mem read", peek_cmd);
@@ -260,8 +275,6 @@ void shell_main() {
     command_register("spawn", "starts a usermode process", spawn_cmd);
     command_register("paging", "tests paging", paging_cmd);
     command_register("recursion", "tests stack guards", recursion_cmd);
-    extern void linux_commands_register(void);
-    linux_commands_register();
     usbloader_init();
 
     /*
